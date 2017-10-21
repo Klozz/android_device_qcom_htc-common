@@ -35,10 +35,15 @@
 #include <sys/mount.h>
 
 /*
-Nougat        7.1   API level 25 | .cpp | int property_set(const char *name, const char *value); std::string property_get(const char* name);
-Nougat        7.0   API level 24 | .cpp | int property_set(const char *name, const char *value); std::string property_get(const char* name);
-Marshmallow   6.0   API level 23 | .cpp | int property_set(const char *name, const char *value); int property_get(const char *name, char *value);
-Lollipop      5.1   API level 22 | .c   | int property_set(const char *name, const char *value); int property_get(const char *name, char *value);
+Oreo          8.0.0 API level 26 | .cpp
+    | uint32_t property_set(const std::string& name, const std::string& value);          [system/core/init/property_service.h]
+    | std::string GetProperty(const std::string& key, const std::string& default_value); [<android-base/properties.h>]
+
+                                          [system/core/init/property_service.h]                    [system/core/init/property_service.h]
+Nougat        7.1   API level 25 | .cpp | int property_set(const char *name, const char *value); | std::string property_get(const char* name);
+Nougat        7.0   API level 24 | .cpp | int property_set(const char *name, const char *value); | std::string property_get(const char* name);
+Marshmallow   6.0   API level 23 | .cpp | int property_set(const char *name, const char *value); | int property_get(const char *name, char *value);
+Lollipop      5.1   API level 22 | .c   | int property_set(const char *name, const char *value); | int property_get(const char *name, char *value);
 Lollipop      5.0   API level 21
 KitKat        4.4.4 API level 19
 */
@@ -48,6 +53,9 @@ KitKat        4.4.4 API level 19
     #include "property_service.h"
     }
 #else
+    #if PLATFORM_SDK_VERSION > 25
+        #include <android-base/properties.h>
+    #endif
     #include "property_service.h"
 #endif
 
@@ -55,7 +63,15 @@ KitKat        4.4.4 API level 19
 #include "init_htcCommon.h"
 
 
-#if PLATFORM_SDK_VERSION > 23
+#if PLATFORM_SDK_VERSION > 25
+    int property_get_sdk23(const char *key, char *value)
+    {
+        std::string propvalue;
+        propvalue = android::base::GetProperty(key, "");
+        strcpy(value, propvalue.c_str());
+        return propvalue.length();
+    }
+#elseif PLATFORM_SDK_VERSION > 23
     int property_get_sdk23(const char *key, char *value)
     {
         std::string propvalue;
