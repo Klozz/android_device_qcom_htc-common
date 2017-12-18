@@ -59,4 +59,26 @@ void set_props_from_build(void);
 }
 #endif
 
+
+
+// TODO: add everything else all includes should be part of htcCommon.h
+//       no longer requiring external references to init/*.h files
+
+
+// Rename vendor_load_properties() to real_vendor_load_properties()
+// and let init_htcCommon.cpp call the real function as appropriate
+extern void real_vendor_load_properties();
+#define vendor_load_properties real_vendor_load_properties
+
+
+// 8.0 no longer *needs* these defines but they are needed for backwards
+// compatibly and have little/no effect on 8.0+'s no length limitation
+#ifndef PROP_NAME_MAX
+#define PROP_NAME_MAX   32
+#endif
+
+#ifndef PROP_VALUE_MAX
+#define PROP_VALUE_MAX  92
+#endif
+
 #endif // _INIT_HTC_COMMON_H

@@ -208,3 +208,19 @@ void set_props_from_build(void)
 
     set_ro_product_device();
 }
+
+
+// init_htcCommon.h will rename vendor_load_properties() to real_vendor_load_properties()
+// Call the appropriate real_vendor_load_properties() depending on android version
+#if PLATFORM_SDK_VERSION > 26
+    #undef vendor_load_properties
+    namespace android {
+    namespace init {
+        void vendor_load_properties() { real_vendor_load_properties(); }
+    }  // namespace init
+    }  // namespace android
+#else
+// does this need extern "C" { ??
+    #undef vendor_load_properties
+    void vendor_load_properties() { real_vendor_load_properties(); }
+#endif
